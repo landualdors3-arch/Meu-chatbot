@@ -360,32 +360,44 @@ knowledgeBase.experiencia = `**Experiência Profissional:**<br><br>**AETHRA SIST
         });
         chatCloseButton.addEventListener('click', toggleChatWindow);
 
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userMessage = chatInput.value.trim();
-            if (!userMessage) return;
+       chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return;
 
-            // 1. Rastreamento de Evento
-            trackEvent('pergunta_enviada');
+    // 1. Rastreamento de Evento
+    trackEvent('pergunta_enviada');
 
-            // 2. Adicionar mensagem do usuário e limpar input
-            addMessageToDOM(userMessage, 'user');
-            chatInput.value = '';
-            chatInput.focus();
+    // 2. Adicionar mensagem do usuário e limpar input
+    addMessageToDOM(userMessage, 'user');
+    chatInput.value = '';
+    chatInput.focus();
 
-            // 3. Mostrar indicador de digitação
-            typingIndicator.classList.remove('hidden');
+    // 3. Mostrar indicador de digitação
+    typingIndicator.classList.remove('hidden');
 
-            let botResponse = '';
-            let tema = "Não identificado";
+    let botResponse = '';
+    let tema = "Não identificado";
 
-            try {
-                // 4. Obter a resposta do Bot
-                botResponse = await getBotResponse(userMessage);
-                addMessageToDOM(botResponse, 'bot');
+    try {
+        // 4. Obter a resposta do Bot
+        botResponse = await getBotResponse(userMessage);
+        addMessageToDOM(botResponse, 'bot');
 
-                // 5. Lógica para determinar o tema (necessária para a notificação)
-                const normalizedMessage = userMessage.toLowerCase()
+        // 5. Lógica para determinar o tema (mantida)
+        const normalizedMessage = userMessage.toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[áàâãä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòôõö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c');
+
+        for (const item of keywordMap) {
+            const found = item.keywords.some(keyword => {
+                const normalizedKeyword = keyword.toLowerCase()
                     .normalize("NFD")
                     .replace(/[\u0300-\u036f]/g, "")
                     .replace(/[áàâãä]/g, 'a')
@@ -394,58 +406,46 @@ knowledgeBase.experiencia = `**Experiência Profissional:**<br><br>**AETHRA SIST
                     .replace(/[óòôõö]/g, 'o')
                     .replace(/[úùûü]/g, 'u')
                     .replace(/[ç]/g, 'c');
-
-                for (const item of keywordMap) {
-                    const found = item.keywords.some(keyword => {
-                        const normalizedKeyword = keyword.toLowerCase()
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .replace(/[áàâãä]/g, 'a')
-                            .replace(/[éèêë]/g, 'e')
-                            .replace(/[íìîï]/g, 'i')
-                            .replace(/[óòôõö]/g, 'o')
-                            .replace(/[úùûü]/g, 'u')
-                            .replace(/[ç]/g, 'c');
-                        return normalizedMessage.includes(normalizedKeyword);
-                    });
-                    
-                    if (found) {
-                        tema = item.key;
-                        break;
-                    }
-                }
-
-            } catch (error) {
-                console.error("Erro ao processar a solicitação localmente:", error);
-                addMessageToDOM("Desculpe, ocorreu um erro interno ao processar sua solicitação. Tente novamente.", 'bot');
-                botResponse = "Erro interno ao processar a solicitação.";
-            } finally {
-                typingIndicator.classList.add('hidden');
+                return normalizedMessage.includes(normalizedKeyword);
+            });
+            
+            if (found) {
+                tema = item.key;
+                break;
             }
+        }
 
-            // 6. Envio de Notificação por EmailJS (após obter a resposta e o tema)
-            questionCount++;
-            try {
-                const templateParams = {
-                    from_name: "Assistente Landualdo",
-                    to_email: "landualdo.rs4@gmail.com", // E-mail de destino fixo
-                    subject: `Nova Pergunta no Portfólio (Pergunta #${questionCount})`,
-                    message: `
-                        **Pergunta #${questionCount}**
-                        **Tema Identificado:** ${tema}
-                        **Pergunta do Usuário:** "${userMessage}"
-                        **Resposta do Chatbot (Trecho):** "${botResponse.substring(0, 100)}..."
-                    `,
-                    reply_to: "no-reply@portfolio.com"
-                };
+    } catch (error) {
+        console.error("Erro ao processar a solicitação localmente:", error);
+        addMessageToDOM("Desculpe, ocorreu um erro interno ao processar sua solicitação. Tente novamente.", 'bot');
+        botResponse = "Erro interno ao processar a solicitação.";
+    } finally {
+        typingIndicator.classList.add('hidden');
+    }
 
-                // Substitua 'YOUR_SERVICE_ID' e 'YOUR_TEMPLATE_ID' pelos seus IDs do EmailJS
-                await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams);
-                console.log("Notificação de nova pergunta enviada com sucesso!");
-            } catch (error) {
-                console.error("Erro ao enviar notificação por EmailJS:", error);
-            }
-        });
+    // 6. Envio de Notificação por EmailJS (Contagem Local)
+    questionCount++; // Incrementa a contagem local (não persistente)
+    try {
+        const templateParams = {
+            from_name: "Assistente Landualdo",
+            to_email: "landualdo.rs4@gmail.com", // E-mail de destino fixo
+            subject: `Nova Pergunta no Portfólio (Pergunta #${questionCount})`,
+            message: `
+                **Pergunta #${questionCount}**
+                **Tema Identificado:** ${tema}
+                **Pergunta do Usuário:** "${userMessage}"
+                **Resposta do Chatbot (Trecho):** "${botResponse.substring(0, 100)}..."
+            `,
+            reply_to: "no-reply@portfolio.com"
+        };
+
+        // Enviar o e-mail (com as chaves já preenchidas)
+        await emailjs.send("service_ycwxahg", "template_zrxdrtd", templateParams);
+        console.log("Notificação de nova pergunta enviada com sucesso!");
+    } catch (error) {
+        console.error("Erro ao enviar notificação por EmailJS:", error);
+    }
+});
 
         // --- 6. Ajuste para teclado mobile ---
         if (window.visualViewport) {
