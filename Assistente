@@ -1,120 +1,468 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Assistente Virtual Landualdo</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; }
-    .chat-container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0002; padding: 20px; }
-    .chat-box { height: 320px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #fafafa; margin-bottom: 10px;}
-    .user { text-align: right; color: #1976d2; margin-bottom: 6px;}
-    .bot { text-align: left; color: #333; margin-bottom: 6px;}
-    .input-row { display: flex; }
-    input[type="text"] { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;}
-    button { padding: 8px 16px; border-radius: 4px; border: none; background: #1976d2; color: #fff; margin-left: 6px;}
-    button:hover { background: #125ea7;}
-    h2 { text-align:center; color:#1976d2;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio - Landualdo Rodrigues Souza</title>
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- EmailJS SDK para envio de email sem backend -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // Substitua 'YOUR_PUBLIC_KEY' pela sua chave pública do EmailJS
+            emailjs.init({
+                publicKey: "YOUR_PUBLIC_KEY",
+            });
+        })();
+    </script>
+    
+    <style>
+        /* ===============================================
+           ESTILOS CSS PERSONALIZADOS
+           =============================================== */
+
+        /* Animação de bounce para o indicador de digitação */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce { animation: bounce 1s infinite; }
+
+        /* Ajustes para mobile: Tornar o chat full-screen em telas pequenas */
+        @media (max-width: 640px) {
+            #chat-window {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: none !important;
+                max-height: none !important;
+                bottom: 0 !important;
+                right: 0 !important;
+                border-radius: 0 !important;
+                transition: none !important;
+            }
+            #chat-window.open {
+                transform: none !important;
+            }
+            #chat-messages {
+                flex: 1 1 auto;
+                overflow-y: auto;
+            }
+            #chat-input {
+                font-size: 16px; /* Aumenta o tamanho do input para melhor usabilidade */
+            }
+            /* Ajuste para quando o teclado abre: usar position fixed e ajustar viewport */
+            body.keyboard-open #chat-window {
+                height: calc(100vh - var(--keyboard-height, 0px)) !important;
+            }
+        }
+    </style>
 </head>
-<body>
-  <div class="chat-container">
-    <h2>Assistente Landualdo</h2>
-    <div class="chat-box" id="chatBox">
-      <div class="bot">Olá! Sou o assistente virtual do Landualdo Rodrigues. Pergunte sobre experiência, formação, cursos, objetivos ou salário!</div>
+<body class="bg-gray-100 font-sans flex justify-center items-center min-h-screen">
+    
+    <!-- ===============================================
+         ESTRUTURA PRINCIPAL DO PORTFÓLIO (Bloco Único)
+         =============================================== -->
+    
+    <div class="max-w-md w-full mx-auto shadow-xl rounded-lg overflow-hidden">
+        
+        <!-- Cabeçalho -->
+        <header class="bg-blue-600 text-white p-6 text-center">
+            <h1 class="text-3xl font-bold">Assistente Landualdo</h1>
+        </header>
+
+        <!-- Seção Sobre Mim -->
+        <section id="sobre" class="bg-white p-6">
+            <h2 class="text-2xl font-semibold mb-4">Sobre Mim</h2>
+            <p>Profissional com experiência em qualidade, processos e análise de dados. Clique no chat para perguntar qualquer coisa sobre mim, meu currículo, experiência, objetivos profissionais ou detalhes pessoais!</p>
+        </section>
+        <!-- Outras seções do portfólio podem ser adicionadas aqui -->
     </div>
-    <form id="chatForm" class="input-row" autocomplete="off">
-      <input type="text" id="userInput" placeholder="Digite sua pergunta..." required autofocus>
-      <button type="submit">Enviar</button>
-    </form>
-  </div>
 
-<script>
-// --- Banco de Dados Completo ---
-const knowledgeBase = {
-  nome: "Landualdo Rodrigues Souza",
-  idade: "35 anos (nascido em 03/11/1990)",
-  endereco: "Contagem, MG (Bairro Flamengo). Originalmente de Salvador, BA, mora em Minas Gerais há 15 anos.",
-  familia: "Tem uma filha de 6 anos que mora em Betim, MG.",
-  contato: "Telefone/Whatsapp: (31) 97202-2291, E-mail: landualdo.rs4@gmail.com.",
-  portfolio: "Portfólio Power BI: https://sites.google.com/view/portfolio-landualdo/in%C3%ADcio",
-  formacao: `Graduação em <b>Gestão da Qualidade</b> e cursando <b>MBA em Gestão da Qualidade</b>. Sólida base em Sistemas de Gestão da Qualidade (SGQ), auditorias internas, análise de indicadores e melhoria contínua de processos.`,
-  cursos: `Certificações e cursos:<br>- <b>Analista da Qualidade</b><br>- <b>Auditor Interno SGI</b> (ISO 9001, 14001, 45001, 19011)<br>- <b>Excel Avançado e Power BI</b><br>- <b>Gestão de Indicadores de Qualidade e Produtividade</b><br>- <b>Ferramentas da Qualidade:</b> 5W2H, Ishikawa, MASP, 8D, Histograma, Pareto, Fluxograma<br>- <b>Filosofias:</b> Kaizen, WCM<br>- <b>Segurança:</b> NR 1 (Riscos Ocupacionais), NR 6 (EPI), LEPAR`,
-  experiencia_atual: `Atualmente é <b>Analista da Qualidade e Processos na Açocon</b> (desde Abril/2025). Atua com controle de qualidade, padronização de processos, gestão documental, elaboração de indicadores/dashboards em Excel, revisão de procedimentos e treinamentos internos.`,
-  experiencia_aethra: `Na <b>AETHRA SISTEMAS AUTOMOTIVOS S.A.</b> (Fev/2023 – Abr/2025) atuou como:<br>1. Técnico de Ensaio e Fadiga JR<br>2. Técnico de Laboratório Metalográfico<br>3. Estagiário em Gestão da Qualidade<br>Desenvolveu competências em auditoria, metrologia, ensaios mecânicos e relatórios técnicos no setor automotivo.`,
-  experiencia_outras: `Também trabalhou na <b>DIBS LTDA</b> (Serviços Fotográficos/Design Gráfico) e na <b>MASTER FOTO</b> (Comunicação Visual), desenvolvendo organização, controle de fluxo e atenção à qualidade.`,
-  experiencia_total: "Mais de <b>10 anos e 9 meses de experiência profissional</b>, sendo <b>2 anos e 9 meses</b> dedicados à gestão da qualidade e processos industriais.",
-  objetivos: `Consolidar-se como especialista em Gestão da Qualidade e Processos, evoluindo para cargos de supervisão ou coordenação. Busca implementar sistemas de indicadores, atuar com melhoria contínua (Lean, PDCA, Kaizen), contribuir com auditorias internas/externas e treinamento de equipes.`,
-  habilidades: `<b>Especialista em:</b><br>- Ferramentas da Qualidade: PDCA, Ishikawa, 5 Porquês, Pareto, FMEA, MASP, 8D<br>- Normas: ISO 9001:2025, 14001, 45001, IATF 16949<br>- Análise de Dados: Excel Avançado (dashboards), Power BI<br>- Processos: Criação/revisão de instruções técnicas, fluxogramas<br>- Auditoria interna e controle metrológico`,
-  salario: `A questão salarial é tratada em etapas avançadas do processo seletivo. Landualdo busca remuneração compatível com sua experiência (nível Analista Pleno/Sênior) e formação (MBA em Gestão da Qualidade). Está aberto a propostas que reflitam seu valor e potencial para contribuir com resultados e melhoria contínua.`,
-  disponibilidade: `Total disponibilidade para qualquer horário e aberto a horas extras.`,
-  lazer: `Gosta de jogar, estudar (atualização profissional), praticar esportes (capoeira) e cinema.`,
-  resumo: `Landualdo Rodrigues Souza é Analista da Qualidade e Processos com mais de 10 anos de experiência profissional (2 anos e 9 meses em qualidade industrial), graduação/MBA em Gestão da Qualidade. Especialista em normas ISO, ferramentas da qualidade e análise de dados. Foco em melhoria contínua, auditorias e otimização de processos.`
-};
+    <!-- ===============================================
+         CHATBOT: Botão Flutuante e Janela
+         =============================================== -->
+    
+    <div class="fixed bottom-6 right-6 z-50">
+        <!-- Botão de Abrir/Fechar Chat -->
+        <button id="chat-toggle-button" class="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+            </svg>
+        </button>
 
-const keywordMap = [
- { keywords: ["idade", "quantos anos", "nascimento"], key: "idade" },
- { keywords: ["nome", "quem é", "quem e", "resumo"], key: "resumo" },
- { keywords: ["contato", "telefone", "email", "whatsapp"], key: "contato" },
- { keywords: ["formacao", "formação", "estudos", "mba", "graduação", "academica"], key: "formacao" },
- { keywords: ["curso", "cursos", "certificação", "certificações", "auditor", "iso", "excel", "power bi"], key: "cursos" },
- { keywords: ["experiencia", "experiência", "trabalho", "carreira", "empregos", "historico"], key: "experiencia_total" },
- { keywords: ["aethra"], key: "experiencia_aethra" },
- { keywords: ["acocon", "atual"], key: "experiencia_atual" },
- { keywords: ["habilidades", "ferramentas"], key: "habilidades" },
- { keywords: ["familia", "filha", "pessoal"], key: "familia" },
- { keywords: ["endereco", "endereço", "mora", "onde", "residencia"], key: "endereco" },
- { keywords: ["portfolio", "projetos"], key: "portfolio" },
- { keywords: ["objetivo", "objetivos", "meta", "futuro"], key: "objetivos" },
- { keywords: ["salario", "pretensão", "remuneração", "valor"], key: "salario" },
- { keywords: ["disponibilidade", "horario", "extra"], key: "disponibilidade" },
- { keywords: ["lazer", "hobby", "jogar", "esporte", "cinema"], key: "lazer" }
-];
+        <!-- Janela do Chat (Inicialmente oculta) -->
+        <div id="chat-window" class="hidden fixed bottom-24 right-6 w-[90vw] max-w-md h-[70vh] max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col transition-all duration-300 ease-out transform origin-bottom-right">
+           
+            <!-- Cabeçalho do Chat -->
+            <div class="flex-shrink-0 bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center shadow-md">
+                <div>
+                    <h3 class="text-lg font-semibold">Assistente Pessoal</h3>
+                    <p class="text-sm text-blue-100">Sobre Landualdo Rodrigues</p>
+                </div>
+                <!-- Botão de Fechar -->
+                <button id="chat-close-button" class="text-blue-200 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
-async function getBotResponse(userMessage) {
- const normalized = userMessage.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
- let response = knowledgeBase.resumo;
- for(const item of keywordMap){
-   if(item.keywords.some(k => normalized.includes(k))){
-     if(item.key === 'experiencia_total'){
-       response = `Experiência total: ${knowledgeBase.experiencia_total}<br><strong>Atual:</strong> ${knowledgeBase.experiencia_atual}<br><strong>AETHRA:</strong> ${knowledgeBase.experiencia_aethra}<br><strong>Outras experiências:</strong> ${knowledgeBase.experiencia_outras}`;
-     } else {
-       response = knowledgeBase[item.key];
-     }
-     break;
-   }
- }
- if(/(ola|oi|bom dia|boa tarde|boa noite)/.test(normalized)){
-   response = `Olá! Sou o assistente virtual do Landualdo Rodrigues. Pergunte sobre experiência, formação, cursos, objetivos ou salário!`;
- }
- if(response === knowledgeBase.resumo && !normalized.includes("resumo")){
-   response = `Desculpe, não encontrei uma resposta específica para essa pergunta.<br>Aqui está um resumo do Landualdo:<br>${knowledgeBase.resumo}<br>Tente perguntar sobre cursos, ferramentas, salário ou experiência atual para obter detalhes.`;
- }
- await new Promise(r => setTimeout(r,600));
- return response;
-}
+            <!-- Área de Mensagens -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
+                <!-- Mensagem de boas-vindas (Inicial) -->
+                <div class="flex justify-start mb-3">
+                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[85%]">
+                        <p class="text-sm">Olá! Sou um assistente virtual treinado com todas as informações sobre Landualdo Rodrigues. Para começar, você pode perguntar sobre um dos temas abaixo:</p>
+                        <ul class="list-disc list-inside mt-2 text-xs">
+                            <li>Cursos e certificações</li>
+                            <li>Formação acadêmica</li>
+                            <li>Trabalho atual</li>
+                            <li>Objetivos profissionais</li>
+                            <li>História pessoal</li>
+                            <li>Família</li>
+                            <li>Lazer e hobbies</li>
+                            <li>Contato e endereço</li>
+                            <li>Idade</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Mensagens serão injetadas aqui pelo JavaScript -->
+            </div>
 
-// --- Chatbot Frontend ---
-const chatBox = document.getElementById('chatBox');
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
+            <!-- Indicador de "Digitando..." -->
+            <div id="typing-indicator" class="hidden flex-shrink-0 p-3 px-4 flex items-center gap-2 bg-white border-t">
+                <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+                <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+                <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <span class="text-xs text-gray-500 ml-1">Digitando...</span>
+            </div>
 
-function addMessage(text, sender) {
- const div = document.createElement('div');
- div.className = sender;
- div.innerHTML = text;
- chatBox.appendChild(div);
- chatBox.scrollTop = chatBox.scrollHeight;
-}
+            <!-- Área de Input -->
+            <div class="flex-shrink-0 p-3 bg-white border-t rounded-b-lg">
+                <form id="chat-form" class="flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Pergunte sobre Landualdo..." class="flex-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" autocomplete="off">
+                    <button type="submit" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-90" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===============================================
+         LÓGICA DO CHATBOT (JavaScript)
+         =============================================== -->
+    <script>
+        // --- 1. Seletores do DOM ---
+        const chatToggleButton = document.getElementById('chat-toggle-button');
+        const chatWindow = document.getElementById('chat-window');
+        const chatCloseButton = document.getElementById('chat-close-button');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const typingIndicator = document.getElementById('typing-indicator');
 
-chatForm.addEventListener('submit', async function(e){
- e.preventDefault();
- const msg = userInput.value.trim();
- if(!msg) return;
- addMessage(msg,'user');
- userInput.value = '';
- const botReply = await getBotResponse(msg);
- addMessage(botReply,'bot');
-});
-</script>
+        // --- 2. Estado do Chat ---
+let isChatOpen = false;
+let chatHistory = [];
+let questionCount = 0; // Contador de perguntas na sessão
+
+        // --- 3. Base de Conhecimento (Dados do Landualdo Rodrigues) ---
+        const knowledgeBase = {
+            nome: "Landualdo Rodrigues Souza",
+            idade: `**Idade:** 35 anos<br>**Data de Nascimento:** 03/11/1990`,
+            endereco: "Para saber informações sobre endereço, entre em contato pelo telefone (31) 97202-2291 ou email landualdo.rs3@gmail.com",
+            contato: "Telefone/WhatsApp: (31) 97202-2291 | Email: landualdo.rs3@gmail.com",
+            familia: "Landualdo tem uma filha de 6 anos que mora em Betim, MG.",
+            trabalho_atual: "Atualmente trabalho na Açocon como Analista da Qualidade e Processos. Para saber mais sobre a empresa, entre em contato.",
+            formacao: `**Formação Acadêmica:**
+- **Formado em Gestão da Qualidade** (06/06/2024)
+- **Cursando MBA em Gestão da Qualidade** (desde 20/08/2024)
+- **Estágio em Gestão da Qualidade** (09/02/2023 a 10/06/2023)`,
+            cursos: `**Cursos e Certificações:**
+- **Excel Avançado**
+- **Power BI**
+- **Pacote Office**
+- **Auditor SGI 9001:2025, 45001, 14001**
+- **Ferramentas de Qualidade**
+- **Analista da Qualidade**`,
+            objetivos: `**Objetivos Profissionais:**
+Pretendo consolidar minha experiência como Analista da Qualidade e me preparar para assumir uma posição de coordenação, onde eu possa liderar projetos de melhoria, auditorias e treinamentos voltados à padronização e eficiência dos processos.`,
+historia: `**Minha História:**
+Sou natural de Salvador (BA) e moro em Minas Gerais há 15 anos, em busca de crescimento profissional e pessoal. Sempre tive o pensamento voltado para o desenvolvimento e novas oportunidades, principalmente por Minas ser um estado com muitas indústrias e fábricas.<br><br>
+Assim que cheguei, comecei trabalhando em uma loja de serviços fotográficos, onde tive meu primeiro contato direto com o público. Essa experiência me despertou o interesse por atender bem e entregar um bom resultado ao cliente. Com o tempo, percebi que queria ter uma profissão sólida, que unisse atendimento, responsabilidade e qualidade.<br><br>
+Foi então que decidi seguir na área da Qualidade, porque sempre acreditei que entregar um produto ou serviço bem-feito é o que realmente faz a diferença. Hoje, como Analista da Qualidade, busco contribuir para a melhoria contínua dos processos, garantir a satisfação do cliente e crescer cada vez mais na minha carreira.<br><br>
+Sou uma pessoa comprometida, comunicativa e com grande vontade de aprender e evoluir, tanto profissionalmente quanto pessoalmente.`,
+            lazer: `**Lazer e Hobbies:**
+Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma pessoa dedicada e gosto de estudar.`,
+            saudacoes: {
+                manha: "Bom dia! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?",
+                tarde: "Boa tarde! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?",
+                noite: "Boa noite! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?"
+            }
+        };
+
+        // Mapeamento de palavras-chave para chaves da knowledgeBase
+        const keywordMap = [
+            { keywords: ["cursos", "curso", "certificacao", "certificacoes", "excel", "power bi", "pacote office", "auditor", "sgi", "9001", "45001", "14001", "ferramentas qualidade", "analista qualidade"], key: "cursos" },
+            { keywords: ["formacao", "qualificacao", "ensino", "grau escolaridade", "graduacao", "mba", "estagio", "gestao qualidade"], key: "formacao" },
+            { keywords: ["endereco", "local", "aonde mora", "voce mora aonde", "qual bairro", "onde mora", "residencia"], key: "endereco" },
+            { keywords: ["filhos", "filha", "filhas", "filho", "familia", "criancas"], key: "familia" },
+            { keywords: ["esta trabalhando", "trabalha atualmente", "esta empregado", "ta empregado", "trabalho atual", "acocon", "analista"], key: "trabalho_atual" },
+            { keywords: ["oque voce gosta de fazer", "oque vc gosta de fazer", "oque voce faz nas horas vagas", "oque vc faz hora vagas", "qual e o seu lazer", "lazer", "gosta de fazer oque da vida", "oque faz no seu horario de descanso", "faz oque finais de semana", "oque vc gosta fazer", "gosta de que", "oque voce gosta", "hobbies", "tempo livre", "capoeira", "filmes", "series"], key: "lazer" },
+            { keywords: ["objetivo", "profissional", "crescimento profissional", "como voce se ver futuramente", "metas", "futuro", "coordenacao", "lideranca"], key: "objetivos" },
+            { keywords: ["qual e sua historia", "vc veio da aonde", "vc e aonde", "voce veio da aonde", "voce e de onde", "terra natal", "naturalidade", "conte sobre voce", "quem e voce", "quem e vc", "quem e landualdo", "de aonde e landualdo", "salvador", "bahia", "minas gerais", "historia pessoal"], key: "historia" },
+            { keywords: ["contato", "telefone", "email", "whatsapp", "como falar"], key: "contato" },
+            { keywords: ["nome", "como se chama"], key: "nome" },
+            { keywords: ["idade", "quantos anos", "nascimento"], key: "idade" },
+            { keywords: ["experiencia", "experiência", "trabalho", "carreira"], key: "experiencia" }
+	        ];
+
+knowledgeBase.experiencia = `**Experiência Profissional:**<br><br>**AETHRA SISTEMAS AUTOMOTIVOS S.A.**<br>**Técnico de Ensaio e Fadiga JR** (08/04/2025 - Período de experiência)<br>•	Realização de ensaios mecânicos (validação de solda, bocais de combustível, eixos, tanques, travessas) em conformidade com as normas FIAT e IATF 16949.<br>•	Condução de auditorias de processos de soldagem.<br>•	Interpretação de desenho mecânico e controle de instrumentos de medição.<br><br>**Técnico de Laboratório Metalográfico** (17/07/2023 - 08/04/2025)<br>•	Execução de ensaios metalográficos (Macrografia, Ensaio LP) e destrutivos.<br>•	Elaboração de relatórios técnicos de soldagem.<br>•	Auditoria de Processo de Soldagem MIG/MAG, com base em IATF 16949 e ISO 9001:2015<br><br>**Estágio Gestão da Qualidade** (09/02/2023 - 10/06/2023)<br>•	Suporte na interpretação e aplicação das normas técnicas FIAT e IATF 16949, ISO 9001:2015<br>•	Elaboração de relatórios de suporte utilizando Excel e Power BI.<br>•	Auxílio na realização de ensaios e suporte em auditorias.`;
+
+        // --- 4. Funções Auxiliares ---
+        function getSaudacao() {
+            const hora = new Date().getHours();
+            if (hora >= 5 && hora < 12) {
+                return knowledgeBase.saudacoes.manha;
+            } else if (hora >= 12 && hora < 18) {
+                return knowledgeBase.saudacoes.tarde;
+            } else {
+                return knowledgeBase.saudacoes.noite;
+            }
+        }
+
+        function toggleChatWindow() {
+            isChatOpen = !isChatOpen;
+            if (isChatOpen) {
+                chatWindow.classList.remove('hidden');
+                chatWindow.classList.add('flex');
+                setTimeout(() => chatInput.focus(), 100);
+            } else {
+                chatWindow.classList.add('hidden');
+                chatWindow.classList.remove('flex');
+            }
+        }
+
+        function addMessageToDOM(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'mb-3', 'chat-message');
+            
+            if (sender === 'user') {
+                messageElement.classList.add('justify-end');
+                messageElement.innerHTML = `
+                    <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[85%]">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                `;
+            } else {
+                messageElement.classList.add('justify-start');
+                const formattedMessage = message
+                    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+                messageElement.innerHTML = `
+                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[85%]">
+                        <p class="text-sm">${formattedMessage}</p>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function getBotResponse(userMessage) {
+            const normalizedMessage = userMessage.toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[áàâãä]/g, 'a')
+                .replace(/[éèêë]/g, 'e')
+                .replace(/[íìîï]/g, 'i')
+                .replace(/[óòôõö]/g, 'o')
+                .replace(/[úùûü]/g, 'u')
+                .replace(/[ç]/g, 'c');
+
+            let response = null;
+
+            // Verificar saudações
+            if (normalizedMessage.includes("bom dia") || normalizedMessage.includes("ola") || normalizedMessage.includes("oi")) {
+                response = getSaudacao();
+            } else {
+                // Buscar na base de conhecimento
+                for (const item of keywordMap) {
+                    const found = item.keywords.some(keyword => {
+                        const normalizedKeyword = keyword.toLowerCase()
+                            .normalize("NFD")
+                            .replace(/[\u0300-\u036f]/g, "")
+                            .replace(/[áàâãä]/g, 'a')
+                            .replace(/[éèêë]/g, 'e')
+                            .replace(/[íìîï]/g, 'i')
+                            .replace(/[óòôõö]/g, 'o')
+                            .replace(/[úùûü]/g, 'u')
+                            .replace(/[ç]/g, 'c');
+                        return normalizedMessage.includes(normalizedKeyword);
+                    });
+                    
+                    if (found) {
+                        response = knowledgeBase[item.key];
+                        break;
+                    }
+                }
+            }
+
+            // Resposta padrão caso não encontre
+            if (!response) {
+	                response = `Desculpe, não encontrei uma resposta específica para essa pergunta. Você pode perguntar sobre:
+	                
+	**Temas disponíveis:**
+	- Cursos e certificações
+	- Formação acadêmica  
+	- Trabalho atual
+	- Objetivos profissionais
+	- História pessoal
+	- Família
+	- Lazer e hobbies
+	- Contato e endereço
+	- Idade
+	
+	Tente reformular sua pergunta ou escolha um dos temas acima!`;
+            }
+
+            // Simular delay de digitação
+            await new Promise(resolve => setTimeout(resolve, 800));
+            return response;
+        }
+
+        // --- 5. Funções de Rastreamento (Tracking) ---
+        function trackEvent(eventName, params = {}) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, params);
+            }
+        }
+
+        // --- 6. Event Listeners ---
+        chatToggleButton.addEventListener('click', () => {
+            toggleChatWindow();
+            if (isChatOpen) {
+                trackEvent('chat_aberto');
+            }
+        });
+        chatCloseButton.addEventListener('click', toggleChatWindow);
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            // 1. Rastreamento de Evento
+            trackEvent('pergunta_enviada');
+
+            // 2. Adicionar mensagem do usuário e limpar input
+            addMessageToDOM(userMessage, 'user');
+            chatInput.value = '';
+            chatInput.focus();
+
+            // 3. Mostrar indicador de digitação
+            typingIndicator.classList.remove('hidden');
+
+            let botResponse = '';
+            let tema = "Não identificado";
+
+            try {
+                // 4. Obter a resposta do Bot
+                botResponse = await getBotResponse(userMessage);
+                addMessageToDOM(botResponse, 'bot');
+
+                // 5. Lógica para determinar o tema (necessária para a notificação)
+                const normalizedMessage = userMessage.toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[áàâãä]/g, 'a')
+                    .replace(/[éèêë]/g, 'e')
+                    .replace(/[íìîï]/g, 'i')
+                    .replace(/[óòôõö]/g, 'o')
+                    .replace(/[úùûü]/g, 'u')
+                    .replace(/[ç]/g, 'c');
+
+                for (const item of keywordMap) {
+                    const found = item.keywords.some(keyword => {
+                        const normalizedKeyword = keyword.toLowerCase()
+                            .normalize("NFD")
+                            .replace(/[\u0300-\u036f]/g, "")
+                            .replace(/[áàâãä]/g, 'a')
+                            .replace(/[éèêë]/g, 'e')
+                            .replace(/[íìîï]/g, 'i')
+                            .replace(/[óòôõö]/g, 'o')
+                            .replace(/[úùûü]/g, 'u')
+                            .replace(/[ç]/g, 'c');
+                        return normalizedMessage.includes(normalizedKeyword);
+                    });
+                    
+                    if (found) {
+                        tema = item.key;
+                        break;
+                    }
+                }
+
+            } catch (error) {
+                console.error("Erro ao processar a solicitação localmente:", error);
+                addMessageToDOM("Desculpe, ocorreu um erro interno ao processar sua solicitação. Tente novamente.", 'bot');
+                botResponse = "Erro interno ao processar a solicitação.";
+            } finally {
+                typingIndicator.classList.add('hidden');
+            }
+
+            // 6. Envio de Notificação por EmailJS (após obter a resposta e o tema)
+            questionCount++;
+            try {
+                const templateParams = {
+                    from_name: "Assistente Landualdo",
+                    to_email: "landualdo.rs4@gmail.com", // E-mail de destino fixo
+                    subject: `Nova Pergunta no Portfólio (Pergunta #${questionCount})`,
+                    message: `
+                        **Pergunta #${questionCount}**
+                        **Tema Identificado:** ${tema}
+                        **Pergunta do Usuário:** "${userMessage}"
+                        **Resposta do Chatbot (Trecho):** "${botResponse.substring(0, 100)}..."
+                    `,
+                    reply_to: "no-reply@portfolio.com"
+                };
+
+                // Substitua 'YOUR_SERVICE_ID' e 'YOUR_TEMPLATE_ID' pelos seus IDs do EmailJS
+                await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams);
+                console.log("Notificação de nova pergunta enviada com sucesso!");
+            } catch (error) {
+                console.error("Erro ao enviar notificação por EmailJS:", error);
+            }
+        });
+
+        // --- 6. Ajuste para teclado mobile ---
+        if (window.visualViewport) {
+            let originalViewportHeight = window.visualViewport.height;
+            window.visualViewport.addEventListener('resize', () => {
+                const newHeight = window.visualViewport.height;
+                if (newHeight < originalViewportHeight) {
+                    document.body.classList.add('keyboard-open');
+                    const keyboardHeight = originalViewportHeight - newHeight;
+                    document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                    document.documentElement.style.setProperty('--keyboard-height', '0px');
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+    </script>
 </body>
 </html>
