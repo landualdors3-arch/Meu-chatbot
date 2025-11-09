@@ -6,22 +6,18 @@
     <title>Portfólio - Landualdo Rodrigues Souza</title>
     <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- NOVO: Script do EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <style>
         /* ===============================================
            ESTILOS CSS PERSONALIZADOS
            =============================================== */
-
         /* Animação de bounce para o indicador de digitação */
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
         .animate-bounce { animation: bounce 1s infinite; }
-
         /* Ajustes para mobile: Tornar o chat full-screen em telas pequenas */
         @media (max-width: 640px) {
             #chat-window {
@@ -52,18 +48,15 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans flex justify-center items-center min-h-screen">
-    
     <!-- ===============================================
          ESTRUTURA PRINCIPAL DO PORTFÓLIO (Bloco Único)
          =============================================== -->
-    
     <div class="max-w-md w-full mx-auto shadow-xl rounded-lg overflow-hidden">
-        
+    
         <!-- Cabeçalho -->
         <header class="bg-blue-600 text-white p-6 text-center">
             <h1 class="text-3xl font-bold">Assistente Landualdo</h1>
         </header>
-
         <!-- Seção Sobre Mim -->
         <section id="sobre" class="bg-white p-6">
             <h2 class="text-2xl font-semibold mb-4">Sobre Mim</h2>
@@ -71,11 +64,9 @@
         </section>
         <!-- Outras seções do portfólio podem ser adicionadas aqui -->
     </div>
-
     <!-- ===============================================
          CHATBOT: Botão Flutuante e Janela
          =============================================== -->
-    
     <div class="fixed bottom-6 right-6 z-50">
         <!-- Botão de Abrir/Fechar Chat -->
         <button id="chat-toggle-button" class="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
@@ -83,10 +74,9 @@
                 <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
             </svg>
         </button>
-
         <!-- Janela do Chat (Inicialmente oculta) -->
         <div id="chat-window" class="hidden fixed bottom-24 right-6 w-[90vw] max-w-md h-[70vh] max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col transition-all duration-300 ease-out transform origin-bottom-right">
-           
+       
             <!-- Cabeçalho do Chat -->
             <div class="flex-shrink-0 bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center shadow-md">
                 <div>
@@ -100,18 +90,27 @@
                     </svg>
                 </button>
             </div>
-
             <!-- Área de Mensagens -->
             <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
                 <!-- Mensagem de boas-vindas (Inicial) -->
                 <div class="flex justify-start mb-3">
-                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[85%]">
+                    <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[85%]'>
                         <p class="text-sm">Olá! Sou um assistente virtual treinado com todas as informações sobre Landualdo Rodrigues. Pergunte qualquer coisa sobre ele, como currículo, experiência, idade, família ou objetivos profissionais!</p>
+                        <p class="text-sm mt-2">Temas disponíveis para consulta:</p>
+                        <ul class="list-disc pl-5 text-sm">
+                            <li>Formação</li>
+                            <li>Cursos</li>
+                            <li>História pessoal</li>
+                            <li>Família</li>
+                            <li>Idade</li>
+                            <li>Contato</li>
+                            <li>Lazer</li>
+                            <li>Experiência</li>
+                        </ul>
                     </div>
                 </div>
                 <!-- Mensagens serão injetadas aqui pelo JavaScript -->
             </div>
-
             <!-- Indicador de "Digitando..." -->
             <div id="typing-indicator" class="hidden flex-shrink-0 p-3 px-4 flex items-center gap-2 bg-white border-t">
                 <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
@@ -119,7 +118,6 @@
                 <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <span class="text-xs text-gray-500 ml-1">Digitando...</span>
             </div>
-
             <!-- Área de Input -->
             <div class="flex-shrink-0 p-3 bg-white border-t rounded-b-lg">
                 <form id="chat-form" class="flex items-center gap-2">
@@ -133,7 +131,6 @@
             </div>
         </div>
     </div>
-    
     <!-- ===============================================
          LÓGICA DO CHATBOT (JavaScript)
          =============================================== -->
@@ -143,10 +140,8 @@
         const EMAILJS_TEMPLATE_ID = 'template_zrxdrtd';
         const EMAILJS_PUBLIC_KEY = 'SbXO1qjL8bmQ7TBC1'; // Chave pública fornecida pelo usuário
         const RECIPIENT_EMAIL = 'landualdo.rs4@gmail.com'; // E-mail do destinatário da notificação
-
         // Inicializa o EmailJS com a chave pública
         emailjs.init(EMAILJS_PUBLIC_KEY);
-
         // --- 1. Seletores do DOM ---
         const chatToggleButton = document.getElementById('chat-toggle-button');
         const chatWindow = document.getElementById('chat-window');
@@ -155,11 +150,9 @@
         const chatInput = document.getElementById('chat-input');
         const chatMessages = document.getElementById('chat-messages');
         const typingIndicator = document.getElementById('typing-indicator');
-
         // --- 2. Estado do Chat ---
         let isChatOpen = false;
         let chatHistory = [];
-
         // --- 3. Base de Conhecimento (Dados do Landualdo Rodrigues) ---
         const knowledgeBase = {
             nome: "Landualdo Rodrigues Souza",
@@ -167,7 +160,26 @@
             endereco: "Para saber informações sobre endereço, entre em contato pelo telefone (31) 97202-2291 ou email landualdo.rs3@gmail.com",
             contato: "Telefone/WhatsApp: (31) 97202-2291 | Email: landualdo.rs3@gmail.com",
             familia: "Landualdo tem uma filha de 6 anos que mora em Betim, MG.",
-            trabalho_atual: "Atualmente trabalho na Açocon como Analista da Qualidade e Processos. Para saber mais sobre a empresa, entre em contato.",
+            experiencia: `**Experiência Profissional**
+**Açocon (Atual)**
+*Analista de Qualidade e Processos*
+• Atuação na manutenção e melhoria do Sistema de Gestão da Qualidade.
+• Elaboração e acompanhamento de indicadores de performance e relatórios gerenciais.
+• Suporte na análise de não conformidades e implementação de ações corretivas.
+**AETHRA SISTEMAS AUTOMOTIVOS S.A.**
+*Técnico de Ensaio e Fadiga JR (08/04/2024 - Período de experiência)*
+• Realização de ensaios mecânicos (validação de solda, bocais de combustível, eixos, tanques, travessas) em conformidade com as normas FIAT e IATF 16949.
+• Condução de auditorias de processos de soldagem.
+• Interpretação de desenho mecânico e controle de instrumentos de medição.
+*Técnico de Laboratório Metalográfico (17/07/2023 - 08/04/2024)*
+• Execução de ensaios metalográficos (Macrografia, Ensaio LP) e destrutivos.
+• Elaboração de relatórios técnicos de soldagem.
+• Auditoria de Processo de Soldagem MIG/MAG, com base em IATF 16949 e ISO 9001.
+*Estágio Gestão da Qualidade (09/02/2023 - 10/06/2023)*
+• Suporte na interpretação e aplicação das normas técnicas FIAT e IATF 16949, ISO 9001.
+• Elaboração de relatórios de suporte utilizando Excel e Power BI.
+• Auxílio na realização de ensaios e suporte em auditorias.
+Pretendo consolidar minha experiência como Analista da Qualidade e me preparar para assumir uma posição de coordenação, onde eu possa liderar projetos de melhoria, auditorias e treinamentos voltados à padronização e eficiência dos processos.`,
             formacao: `**Formação Acadêmica:**
 - **Formado em Gestão da Qualidade** (06/06/2024)
 - **Cursando MBA em Gestão da Qualidade** (desde 20/08/2024)
@@ -179,39 +191,30 @@
 - **Auditor SGI 9001:2025, 45001, 14001**
 - **Ferramentas de Qualidade**
 - **Analista da Qualidade**`,
-            objetivos: `**Objetivos Profissionais:**
-Pretendo consolidar minha experiência como Analista da Qualidade e me preparar para assumir uma posição de coordenação, onde eu possa liderar projetos de melhoria, auditorias e treinamentos voltados à padronização e eficiência dos processos.`,
-            historia: `**Minha História:**
-Meu nome é Landualdo, sou natural de Salvador (BA) e há cerca de 15 anos me mudei para Minas Gerais em busca de crescimento profissional. Sempre tive o pensamento voltado para o desenvolvimento e novas oportunidades, principalmente por Minas ser um estado com muitas indústrias e fábricas.
-
-Assim que cheguei, comecei trabalhando em uma loja de serviços fotográficos, onde tive meu primeiro contato direto com o público. Essa experiência me despertou o interesse por atender bem e entregar um bom resultado ao cliente. Com o tempo, percebi que queria ter uma profissão sólida, que unisse atendimento, responsabilidade e qualidade.
-
-Foi então que decidi seguir na área da Qualidade, porque sempre acreditei que entregar um produto ou serviço bem-feito é o que realmente faz a diferença. Hoje, como Analista da Qualidade, busco contribuir para a melhoria contínua dos processos, garantir a satisfação do cliente e crescer cada vez mais na minha carreira.
-
-Sou uma pessoa comprometida, comunicativa e com grande vontade de aprender e evoluir, tanto profissionalmente quanto pessoalmente.`,
+            objetivos: `Pretendo consolidar minha experiência como Analista da Qualidade e me preparar para assumir uma posição de coordenação, onde eu possa liderar projetos de melhoria, auditorias e treinamentos voltados à padronização e eficiência dos processos.`,
+            historia: `**História Pessoal:** Sou de Salvador (BA) e estou em Minas Gerais há 15 anos. Vim em busca de novas oportunidades e comecei a trabalhar em uma loja de serviços fotográficos, no Eldorado, em Contagem, onde fiquei por 7 anos como vendedor. Por trabalhar bastante com clientes, vendendo produtos e serviços, identifiquei-me com a área da Qualidade. Desde então, dediquei-me a estudar e me qualificar nessa área.`,
             lazer: `**Lazer e Hobbies:**
-Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma pessoa dedicada e gosto de estudar.`,
+Gosto de praticar capoeira, assistir filmes e estudar.`,
             saudacoes: {
                 manha: "Bom dia! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?",
                 tarde: "Boa tarde! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?",
                 noite: "Boa noite! Sou o assistente virtual de Landualdo Rodrigues. Como posso ajudá-lo hoje?"
             }
         };
-
         // Mapeamento de palavras-chave para chaves da knowledgeBase
         const keywordMap = [
             { keywords: ["cursos", "curso", "certificacao", "certificacoes", "excel", "power bi", "pacote office", "auditor", "sgi", "9001", "45001", "14001", "ferramentas qualidade", "analista qualidade"], key: "cursos" },
             { keywords: ["formacao", "qualificacao", "ensino", "grau escolaridade", "graduacao", "mba", "estagio", "gestao qualidade"], key: "formacao" },
             { keywords: ["endereco", "local", "aonde mora", "voce mora aonde", "qual bairro", "onde mora", "residencia"], key: "endereco" },
             { keywords: ["filhos", "filha", "filhas", "filho", "familia", "criancas"], key: "familia" },
-            { keywords: ["esta trabalhando", "trabalha atualmente", "esta empregado", "ta empregado", "trabalho atual", "acocon", "analista"], key: "trabalho_atual" },
+            { keywords: ["experiencia", "profissional", "trabalho", "emprego", "historico", "acocon", "aethra", "analista", "tecnico", "estagiario", "qualidade", "processos", "metalografico", "ensaio", "fadiga"], key: "experiencia" },
             { keywords: ["objetivo", "profissional", "crescimento profissional", "como voce se ver futuramente", "metas", "futuro", "coordenacao", "lideranca"], key: "objetivos" },
-            { keywords: ["qual e sua historia", "vc veio da aonde", "vc e aonde", "voce veio da aonde", "voce e de onde", "terra natal", "naturalidade", "conte sobre voce", "quem e voce", "quem e vc", "quem e landualdo", "de aonde e landualdo", "salvador", "bahia", "minas gerais"], key: "historia" },
+            { keywords: ["historia", "pessoal", "historia pessoal", "salvador", "bahia", "minas gerais", "conte sobre voce", "quem e voce"], key: "historia" },
             { keywords: ["contato", "telefone", "email", "whatsapp", "como falar"], key: "contato" },
             { keywords: ["nome", "como se chama"], key: "nome" },
-            { keywords: ["idade", "quantos anos", "nascimento"], key: "idade" }
+            { keywords: ["idade", "quantos anos", "nascimento"], key: "idade" },
+            { keywords: ["lazer", "hobbies", "hobby", "tempo livre", "diversao", "capoeira", "filmes", "series", "estudar", "o que gosta de fazer", "passa tempo", "passatempo"], key: "lazer" }
         ];
-
         // --- 4. Funções Auxiliares ---
         function getSaudacao() {
             const hora = new Date().getHours();
@@ -223,7 +226,6 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                 return knowledgeBase.saudacoes.noite;
             }
         }
-
         function toggleChatWindow() {
             isChatOpen = !isChatOpen;
             if (isChatOpen) {
@@ -235,11 +237,10 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                 chatWindow.classList.remove('flex');
             }
         }
-
         function addMessageToDOM(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('flex', 'mb-3', 'chat-message');
-            
+        
             if (sender === 'user') {
                 messageElement.classList.add('justify-end');
                 messageElement.innerHTML = `
@@ -258,11 +259,10 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                     </div>
                 `;
             }
-            
+        
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
         /**
          * NOVO: Função para enviar a notificação por e-mail
          * @param {string} userQuestion A pergunta feita pelo usuário.
@@ -275,7 +275,6 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                 bot_answer: botAnswer,
                 // Adicione outros parâmetros que seu template possa precisar
             };
-
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
                 .then((response) => {
                     console.log('✅ SUCESSO! Notificação por e-mail enviada com sucesso!', response.status, response.text);
@@ -283,7 +282,6 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                     console.error('❌ FALHA! Erro ao enviar notificação por e-mail:', error);
                 });
         }
-
         async function getBotResponse(userMessage) {
             const normalizedMessage = userMessage.toLowerCase()
                 .normalize("NFD")
@@ -294,15 +292,18 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                 .replace(/[óòôõö]/g, 'o')
                 .replace(/[úùûü]/g, 'u')
                 .replace(/[ç]/g, 'c');
-
             let response = null;
-
             // Verificar saudações
             if (normalizedMessage.includes("bom dia") || normalizedMessage.includes("ola") || normalizedMessage.includes("oi")) {
                 response = getSaudacao();
             } else {
                 // Buscar na base de conhecimento
                 for (const item of keywordMap) {
+                    // Correção robusta para 'historia'
+                    if (item.key === 'historia' && normalizedMessage.includes('historia')) {
+                        response = knowledgeBase[item.key];
+                        break;
+                    }
                     const found = item.keywords.some(keyword => {
                         const normalizedKeyword = keyword.toLowerCase()
                             .normalize("NFD")
@@ -315,82 +316,57 @@ Eu gosto de assistir filmes e séries, meu esporte favorito é capoeira. Sou uma
                             .replace(/[ç]/g, 'c');
                         return normalizedMessage.includes(normalizedKeyword);
                     });
-                    
+                
                     if (found) {
                         response = knowledgeBase[item.key];
                         break;
                     }
                 }
             }
-
             // Resposta padrão caso não encontre
+            const defaultResponse = `Desculpe, não encontrei uma resposta específica para essa pergunta. Você pode perguntar sobre Landualdo Rodrigues, como currículo, experiência, idade, família ou objetivos profissionais!`;
             if (!response) {
-                response = `Desculpe, não encontrei uma resposta específica para essa pergunta. Você pode perguntar sobre:
-                
-**Temas disponíveis:**
-- Cursos e certificações
-- Formação acadêmica  
-- Trabalho atual
-- Objetivos profissionais
-- História pessoal
-- Família
-- Lazer e hobbies
-- Contato e endereço
-
-Tente reformular sua pergunta ou escolha um dos temas acima!`;
+                response = defaultResponse;
             }
-
-            // Simular delay de digitação
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Envia a notificação por e-mail apenas se for uma resposta específica (não a padrão)
+            if (response !== defaultResponse) {
+                sendEmailNotification(userMessage, response);
+            }
             return response;
         }
-
+        async function processMessage(event) {
+            event.preventDefault();
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+            addMessageToDOM(userMessage, 'user');
+            chatHistory.push({ sender: 'user', message: userMessage });
+            chatInput.value = '';
+            typingIndicator.classList.remove('hidden');
+            typingIndicator.classList.add('flex');
+            // Simula um tempo de resposta do bot
+            setTimeout(async () => {
+                const botResponse = await getBotResponse(userMessage);
+                addMessageToDOM(botResponse, 'bot');
+                chatHistory.push({ sender: 'bot', message: botResponse });
+                typingIndicator.classList.add('hidden');
+                typingIndicator.classList.remove('flex');
+            }, 1000);
+        }
         // --- 5. Event Listeners ---
         chatToggleButton.addEventListener('click', toggleChatWindow);
         chatCloseButton.addEventListener('click', toggleChatWindow);
-
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userMessage = chatInput.value.trim();
-            if (!userMessage) return;
-
-            // Adicionar mensagem do usuário
-            addMessageToDOM(userMessage, 'user');
-            chatInput.value = '';
-            chatInput.focus();
-
-            // Mostrar indicador de digitação
-            typingIndicator.classList.remove('hidden');
-
-            try {
-                const botResponse = await getBotResponse(userMessage);
-                addMessageToDOM(botResponse, 'bot');
-                
-                // NOVO: Enviar notificação por e-mail após a resposta do bot
-                sendEmailNotification(userMessage, botResponse);
-
-            } catch (error) {
-                console.error("Erro ao processar a solicitação localmente:", error);
-                addMessageToDOM("Desculpe, ocorreu um erro interno ao processar sua solicitação. Tente novamente.", 'bot');
-            } finally {
-                typingIndicator.classList.add('hidden');
-            }
-        });
-
-        // --- 6. Ajuste para teclado mobile ---
+        chatForm.addEventListener('submit', processMessage);
+        // Lógica para ajustar a altura do chat quando o teclado virtual abre em dispositivos móveis
         if (window.visualViewport) {
-            let originalViewportHeight = window.visualViewport.height;
+            const initialHeight = window.innerHeight;
             window.visualViewport.addEventListener('resize', () => {
-                const newHeight = window.visualViewport.height;
-                if (newHeight < originalViewportHeight) {
+                const keyboardHeight = initialHeight - window.visualViewport.height;
+                document.body.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+                if (keyboardHeight > 100) { // Heurística para detectar teclado aberto
                     document.body.classList.add('keyboard-open');
-                    const keyboardHeight = originalViewportHeight - newHeight;
-                    document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
                 } else {
                     document.body.classList.remove('keyboard-open');
-                    document.documentElement.style.setProperty('--keyboard-height', '0px');
                 }
-                chatMessages.scrollTop = chatMessages.scrollHeight;
             });
         }
     </script>
